@@ -1,38 +1,66 @@
-#include<stdio.h>
+#include <stdio.h>
+#include<stdbool.h>
 #include<string.h>
 #define max 100
 int stack[max];
-int top=-1;
+int top = -1;
+int isOperator(char ch) {
+    return (ch == '+' || ch == '-' || ch == '*' || ch == '/'|| ch == '^');
+}
+
+int getPrecedence(char op) {
+    switch(op) {
+        case '+':
+        case '-':
+            return 1;
+        case '*':
+        case '/':
+            return 2;
+        case '^':
+            return 3;
+        default:
+            return 0; 
+    }
+}
 void push(float val){
         top++;
         stack[top] = val;
 }
-int pop(){
-        int value = stack[top];
+float pop(){
+        float value = stack[top];
         top--;
         return value;
 }
-int priority(char operator){
-    int value;
-    switch (operator)
-    {
-    case '$':
-        value = 0;
-        break;
-    case '(':
-        value = 1;
-        break;
-    case '+': case '-':
-        value = 2;
-        break;
-    case '/': case '*':
-        value = 4;
-        break;
-    case '^':
-        value = 6;
-        break;
+void infixToPostfix(char* infix,char* postfix) {
+    int i, j;
+    char operator;
+    
+    for (i = 0, j = 0; infix[i] != '\0'; i++) {
+        if ((infix[i] >= 'a' && infix[i] <= 'z') || (infix[i] >= 'A' && infix[i] <= 'Z')) {
+            postfix[j++] = infix[i];
+        } else if (isOperator(infix[i])) {
+            while (top >= 0 && getPrecedence(stack[top]) >= getPrecedence(infix[i])) {
+                operator = pop();
+                postfix[j++] = operator;
+            }
+            push(infix[i]);
+        } else if (infix[i] == '(') {
+            push(infix[i]);
+        } else if (infix[i] == ')') {
+           while (top >= 0 && stack[top] != '(') {
+                operator = pop();
+                postfix[j++] = operator;
+            }
+            top--;
+        }
     }
-    return value;
+    while (top >= 0) {
+            operator = pop();
+                postfix[j++] = operator;
+    }
+
+    
+    postfix[j] = '\0';
 }
 void display(char* str){
     int n = strlen(str);
@@ -41,44 +69,31 @@ void display(char* str){
         printf("%c",str[i]);
     }
 }
-void infixtopost(char* infix,char* postfix){
-    int n = strlen(infix);
-    push('$');
-    int k=0;
-    for(int i=0;i<n;i++){
-        if((infix[i]>=65&&infix[i]<=90)||(infix[i]>=97&&infix[i]<=122)){
-            postfix[k++]=infix[i];
-        }
-        else if(priority(infix[i])==1){
-            int val = i;
-            while(infix[val]!=')'){
-                push(infix[val]);
-                val++;
-            }
-            for(int j=i;j<val;j++){
-                char operator = pop();
-                postfix[k++]= operator;
-            }
-        }
-        else{
-            if(priority(infix[i])>priority(stack[top])){
-                push(infix[i]);
-            }
-            else if(priority(infix[i])==priority(stack[top])){
-                char operator = pop();
-                postfix[k++]= operator;
-                push(infix[i]);
-            }
-            else{
-                postfix[k++]=infix[i];
-            }
-        }
-    }
-}
-int main(){
-    char infix[max],postfix[max];
-    printf("Enter the Infix Expression : ");
+int main() {
+    char infix[100], postfix[100];
+
+    // Input infix expression
+    printf("Enter the infix expression: ");
     gets(infix);
-    infixtopost(infix,postfix);
+
+    // Convert infix to postfix
+    infixToPostfix(infix, postfix);
+
+    // Display the postfix expression
     display(postfix);
+
+    return 0;
 }
+
+/*
+A+B					o/p: AB+
+A+B-C+D*E/F			o/p: AB+C-DE*F/+
+A-B+C-D/E*F*(G-H)		o/p: AB-C+DE/F*GH-*-
+A+B*C^D-E-F-G/H/J*K*L+M	o/p: ABCD^*+E-F-GH/J/K*L*-M+
+A*(B+C)/(D-(E-F^G-H))		o/p: ABC+*DEFG^-H- -/
+(A-B-(C^D))/((E^(F*G-H)))	o/p: AB-CD^-EFG*H-^/
+((A+B)^C^D)+E			o/p: AB+ C^D^E+
+(A*(B*C/D)^E)			o/p: ABC*D/E^*
+(A*(B/C*D))^E			o/p: ABC/D**E^
+
+*/

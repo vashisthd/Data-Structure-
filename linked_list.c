@@ -3,8 +3,12 @@
 typedef struct node{
     int data;
     struct node* link;
-}node ;
+}node;
 void traverse(node* head){
+    if(head == NULL){
+        printf("Empty");
+        exit(1);
+    }
     node* temp = head;
     while(temp != NULL){
         printf("%d ",temp->data);
@@ -12,25 +16,30 @@ void traverse(node* head){
     }
 }
 node* create(){
-    int val;
+    int choice;
     node *start,*temp,*curr;
-    printf("Enter data : ");
-    scanf("%d",&val);
-    if(val == -1){
+    printf("Enter your choice : \nPress 1 for create node & Press 0 for exit \n");
+    scanf("%d",&choice);
+    if(choice == 0){
         start = NULL;
         return start;
     }
+    int val;
+    printf("Enter data : ");
+    scanf("%d",&val);
     start = (node*)malloc(sizeof(node));
     start -> data = val;
     curr = start;
-    printf("Data Stored .....\n");
-    while(val != -1){
-        printf("Enter data : ");
-        scanf("%d",&val);
-        if(val == -1){
+    printf("Data Stored Successfully.....\n");
+    while(choice != 0){
+        printf("Enter choice : ");
+        scanf("%d",&choice);
+        if(choice == 0){
             break;
         }
         else{
+            printf("Enter data : ");
+            scanf("%d",&val);
             temp = (node*)malloc(sizeof(node));
             temp -> data = val;
             curr -> link = temp;
@@ -42,9 +51,11 @@ node* create(){
     return start;
 }
 int main(){
-    node* start;
-    start = create();
+    node* temp;
+    temp = create();
     printf("Linked list is : ");
-    traverse(start);
+    traverse(temp);
+    printf("Linked list is : ");
+    traverse(temp);
     return 0;
 }
