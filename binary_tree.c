@@ -30,10 +30,8 @@ btree* create(int parent_data,int side){
     scanf("%d",&choice);
     if(choice == 0){
         root1->left = NULL;
-        // return root1;
     }
         else{
-        // root1 = (btree*)malloc(sizeof(btree));
         root1->left = create(root1->data,1);
     }
 
@@ -41,12 +39,10 @@ btree* create(int parent_data,int side){
     scanf("%d",&choice);
     if(choice == 0){
         root1->right = NULL;
-            // return root1;
     }
     else{
-        // root1 = (btree*)malloc(sizeof(btree));
         root1->right = create(root1->data,2);
-        }
+    }
     
     return root1;
 }
